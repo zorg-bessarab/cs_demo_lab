@@ -1,0 +1,43 @@
+pipeline {
+  agent any
+    triggers {
+    GenericTrigger(
+     genericVariables: [
+         [defaultValue: '', key: 'pod', regexpFilter: '', value: '$.events[0].pod_name'], 
+         [defaultValue: '', key: 'node', regexpFilter: '', value: '$.events[0].node_name'],
+         [defaultValue: '', key: 'event', regexpFilter: '', value: '$']
+         ],
+
+     causeString: 'Triggered on $event',
+
+     token: '',
+     tokenCredentialId: '',
+
+     printContributedVariables: true,
+     printPostContent: true,
+
+     silentResponse: false,
+     
+     shouldNotFlatten: false,
+
+     regexpFilterText: '',
+     regexpFilterExpression: ''
+    )
+  }
+  stages {
+    stage('Scale replicas') {
+        steps{
+        withKubeConfig([credentialsId: '0f521642-12ee-4a9d-b6e2-deb81551aec2', serverUrl: 'https://kubernetes.default']) {
+           sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'  
+           sh 'chmod u+x ./kubectl'  
+           sh """./kubectl scale --replicas=0 deployment \$(./kubectl get replicaset \$(./kubectl get pod $pod -o jsonpath='{.metadata.ownerReferences[0].name}') -o jsonpath='{.metadata.ownerReferences[0].name}')"""
+        }
+        }
+    }
+    stage('Echo $event') {
+      steps {
+        sh "echo $event"
+      }
+    }
+  }
+}
