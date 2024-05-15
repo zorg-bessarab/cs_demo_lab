@@ -1,0 +1,20 @@
+# jenkins-values.yaml
+# меняем пароль для администратора
+controller:
+  admin:
+    createSecret: true
+    username: "jenkins"
+    password: "jenkins"
+  # Плагин для запуска kubectl в агентах jenkins
+  additionalPlugins:
+  - kubernetes-cli:1.12.1
+  - generic-webhook-trigger:2.2.1
+# Публикация сервиса через ингресс
+  ingress:
+    enabled: true
+    apiVersion: "networking.k8s.io/v1"
+    ingressClassName: nginx
+# Создание SA для агента
+  serviceAccountAgent:
+    create: true
+    name: jenkins-agent
