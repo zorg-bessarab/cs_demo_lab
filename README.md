@@ -164,7 +164,7 @@ EOF
 kubectl get secrets jenkins-robot-secret -o go-template --template '{{index .data "token"}}' | base64 -d
 # После этого забираем id credential и вставляем в конфигурацию пайплайна
 ```
-4. Создаём проект, который может управлять кластером через webhook```
+4. Создаём проект, который может управлять кластером через webhook
 ```groovy
 pipeline {
   agent any
@@ -327,7 +327,7 @@ kubectl edit ingress reverse-proxy-ingress -n ptcs
 ```
    5. Также нужно добавить эти alias в ваш DNS или /etc/hosts
    6. Проверяем доступы. Логинимся в консоль. Активируем лицензию.
-   7. Настраиваем сервис уведомлений webhook для Jenkins. Указываем имя кубового сервиса http://10.96.32.166:8080 и путь /generic-webhook-trigger/invoke
+   7. Настраиваем сервис уведомлений webhook для Jenkins. Указываем имя кубового сервиса http://<jenkins-service-dns>:8080 и путь /generic-webhook-trigger/invoke
    8. Настраиваем правила для сканирования конфигураций и рантайма. Правилу рантайма указываем существующий шаблон.
    9. запускаем star-wars-demo/03-pod-cmdline.sh копируем команду и проверяем работу
    10. Вручную запускаем пайплайн для конфигов. (Указываем Id правила в переменных)
