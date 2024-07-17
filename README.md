@@ -220,13 +220,13 @@ pipeline {
     imageName = "registry.demo:5000/quay.io/cilium/hubble-export-stdout:v1.0.3"
     report_format = "html"
     configRuleID = "f75ca39f-b88d-4b72-b154-04d39530ad50"
-    configDir = "guestbook-go"
+    configDir = "*"
   }
   agent any
   stages {
     stage('scm') {
 	    steps {
-			git branch: 'master', url: 'https://github.com/kubernetes/examples.git'
+			git branch: 'master', url: 'https://github.com/zorg-bessarab/VAmPI.git'
 	    }
 	}
     stage('Get latest ptcs-cli') {
@@ -239,7 +239,7 @@ pipeline {
     stage('Scan Config'){
       steps {      
           sh """
-            find . -type f -name Dockerfile -path "*/${configDir}/*" -exec sh -c \'./ptcs-cli scan dockerfile --login=${ptcsUser} --password=${ptcsPassword} \
+            find . -type f -name Dockerfile -path "${configDir}" -exec sh -c \'./ptcs-cli scan dockerfile --login=${ptcsUser} --password=${ptcsPassword} \
             --enforced-rules=${configRuleID} \
             --ptcsurl=${ptcsAddr} --log-level=DEBUG --tls-skip-verify --report-output=report_deockerfile.${report_format} \
             --report-format=${report_format} \
@@ -248,7 +248,7 @@ pipeline {
           sh """
           echo "=== Scanning config folders==="
           echo "" > output.yaml
-          find . -type f -name '*.yaml' -path "*/${configDir}/*" -print -exec sh -c 'cat \$1 >> output.yaml && echo -e "\n---\n" >> output.yaml ' -- {} ";"
+          find . -type f -name '*.yaml' -path "${configDir}" -print -exec sh -c 'cat \$1 >> output.yaml && echo -e "\n---\n" >> output.yaml ' -- {} ";"
           echo "=== Scanning config with PT CS: ===" 
           cat output.yaml
           ./ptcs-cli scan kubernetes --login=${ptcsUser} --password=${ptcsPassword} \
