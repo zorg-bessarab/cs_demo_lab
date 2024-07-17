@@ -195,7 +195,7 @@ pipeline {
   stages {
     stage('Scale replicas') {
         steps{
-        withKubeConfig([credentialsId: '0f521642-12ee-4a9d-b6e2-deb81551aec2', serverUrl: 'https://kubernetes.default']) {
+        withKubeConfig([credentialsId: '', serverUrl: 'https://kubernetes.default']) {
            sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'  
            sh 'chmod u+x ./kubectl'  
            sh """./kubectl scale --replicas=0 deployment \$(./kubectl get replicaset \$(./kubectl get pod $pod -o jsonpath='{.metadata.ownerReferences[0].name}') -o jsonpath='{.metadata.ownerReferences[0].name}')"""
@@ -256,6 +256,15 @@ pipeline {
             --ptcsurl=${ptcsAddr} --log-level=DEBUG --tls-skip-verify --report-output=report_kubernetes.${report_format} \
             --report-format=${report_format} \
             output.yaml"""
+        }
+    }
+    stage('Deploy VamPI') {
+      steps{
+        withKubeConfig([credentialsId: '', serverUrl: 'https://kubernetes.default']) {
+           sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'  
+           sh 'chmod u+x ./kubectl'
+           sh "./kubectl apply -f *.yaml -n default"
+        }
         }
     }
   }
